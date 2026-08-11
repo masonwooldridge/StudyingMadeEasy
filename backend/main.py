@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-
+from api.courses import router as courses_router
+from api.users import router as users_router
 from database import engine
+from api.auth import router as auth_router
 
 app = FastAPI()
 
@@ -14,6 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(courses_router)
 
 @app.get("/")
 def root():
