@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: study-ai-db
+    environment:
+      POSTGRES_USER: studyai
+      POSTGRES_PASSWORD: studyai_password
+      POSTGRES_DB: studyai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
