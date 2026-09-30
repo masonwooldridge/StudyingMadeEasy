@@ -31,3 +31,8 @@ class Course(Base):
     user: Mapped["User"] = relationship(
         back_populates="courses",
     )
+
+    documents: Mapped[list["Document"]] = relationship(
+        back_populates="course",
+        cascade="all, delete-orphan",
+    )

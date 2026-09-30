@@ -11,6 +11,13 @@ type Course = {
   created_at: string;
 };
 
+type Document = {
+  id: number;
+  filename: string;
+  course_id: number;
+  created_at: string;
+};
+
 export default function CoursePage() {
   const params = useParams();
   const router = useRouter();
@@ -18,8 +25,30 @@ export default function CoursePage() {
   const courseId = params.id;
 
   const [course, setCourse] = useState<Course | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function loadDocuments(token: string) {
+    const response = await fetch(
+      `http://localhost:8000/courses/${courseId}/documents`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not load documents");
+    }
+
+    const data = await response.json();
+    setDocuments(data);
+  }
 
   useEffect(() => {
     async function loadCourse() {
@@ -51,7 +80,10 @@ export default function CoursePage() {
         }
 
         const data = await response.json();
+
         setCourse(data);
+
+        await loadDocuments(token);
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -65,6 +97,57 @@ export default function CoursePage() {
 
     loadCourse();
   }, [courseId, router]);
+
+  async function handleUpload() {
+    if (!selectedFile) {
+      return;
+    }
+
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const formData = new FormData();
+
+      formData.append("file", selectedFile);
+
+      const response = await fetch(
+        `http://localhost:8000/courses/${courseId}/documents`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Could not upload document");
+      }
+
+      setSelectedFile(null);
+
+      await loadDocuments(token);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setUploading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -119,31 +202,96 @@ export default function CoursePage() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Materials
+        <div className="mb-10 rounded-xl bg-white p-6 shadow-sm">
+          <div className="mb-6">
+            <h3 className="text-2xl font-semibold text-gray-900">
+              Study Materials
             </h3>
 
-            <p className="mt-2 text-sm text-gray-600">
-              Upload notes, slides, and PDFs.
+            <p className="mt-2 text-gray-600">
+              Upload PDF notes, lecture slides, and study guides.
             </p>
+          </div>
 
-            <button className="mt-6 font-medium underline">
-              View Materials
+          <div className="rounded-lg border border-dashed border-gray-300 p-6">
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setSelectedFile(file);
+              }}
+              className="block w-full text-sm text-gray-700"
+            />
+
+            {selectedFile && (
+              <p className="mt-3 text-sm text-gray-600">
+                Selected: {selectedFile.name}
+              </p>
+            )}
+
+            <button
+              onClick={handleUpload}
+              disabled={!selectedFile || uploading}
+              className="mt-4 rounded-lg bg-black px-4 py-2 font-medium text-white disabled:opacity-50"
+            >
+              {uploading ? "Uploading..." : "Upload PDF"}
             </button>
           </div>
 
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-gray-900">
+              Uploaded Materials
+            </h4>
+
+            {documents.length === 0 ? (
+              <p className="mt-3 text-gray-600">
+                No documents uploaded yet.
+              </p>
+            ) : (
+              <div className="mt-4 space-y-3">
+                {documents.map((document) => (
+                  <div
+                    key={document.id}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {document.filename}
+                      </p>
+
+                      <p className="mt-1 text-sm text-gray-500">
+                        Uploaded{" "}
+                        {new Date(
+                          document.created_at
+                        ).toLocaleDateString()}
+                      </p>
+                    </div>
+
+                    <span className="text-sm text-gray-500">
+                      PDF
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3">
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900">
               AI Tutor
             </h3>
 
             <p className="mt-2 text-sm text-gray-600">
-              Ask questions about your course.
+              Ask questions about your course materials.
             </p>
 
-            <button className="mt-6 font-medium underline">
+            <button
+              onClick={() => router.push(`/courses/${course.id}/tutor`)}
+              className="mt-6 font-medium underline"
+            >
               Open Tutor
             </button>
           </div>

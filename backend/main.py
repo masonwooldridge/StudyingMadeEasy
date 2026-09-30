@@ -5,7 +5,9 @@ from api.courses import router as courses_router
 from api.users import router as users_router
 from database import engine
 from api.auth import router as auth_router
-
+from api.documents import router as documents_router
+from api.search import router as search_router
+from api.tutor import router as tutor_router
 app = FastAPI()
 
 app.add_middleware(
@@ -19,6 +21,9 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(courses_router)
+app.include_router(documents_router)
+app.include_router(search_router)
+app.include_router(tutor_router)
 
 @app.get("/")
 def root():
