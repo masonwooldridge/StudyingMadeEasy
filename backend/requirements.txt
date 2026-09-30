@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 alembic==1.19.1
 annotated-doc==0.0.5
 annotated-types==0.8.0
@@ -62,7 +64,8 @@ starlette==1.6.0
 sympy==1.14.0
 threadpoolctl==3.6.0
 tokenizers==0.22.2
-torch==2.13.0
+torch==2.13.0; platform_system != "Linux"
+torch==2.13.0+cpu; platform_system == "Linux"
 tqdm==4.70.0
 transformers==5.15.0
 truststore==0.10.4
