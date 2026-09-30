@@ -1,7 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import AuthShell from "../components/auth-shell";
+import { API_URL } from "../lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,7 +21,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/auth/login", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,19 +53,22 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">
-          Welcome back
-        </h1>
-
-        <p className="mb-6 text-gray-600">
-          Log in to continue studying.
+    <AuthShell
+      eyebrow="Welcome back"
+      title="Return to your study desk."
+      subtitle="Pick up where you left off and keep your momentum going."
+      footer={
+        <p>
+          New here?{" "}
+          <Link href="/register" className="font-bold text-[#264a38] underline decoration-[#b65f42]/50 underline-offset-4">
+            Create your account
+          </Link>
         </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+      }
+    >
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-sm font-bold text-[#344239]">
               Email
             </label>
 
@@ -71,13 +77,13 @@ export default function LoginPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-black"
+              className="focus-ring w-full rounded-xl border border-[#cfc9bc] bg-white px-4 py-3.5 text-[#1d251f] outline-none transition focus:border-[#264a38]"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-sm font-bold text-[#344239]">
               Password
             </label>
 
@@ -86,13 +92,13 @@ export default function LoginPage() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-black"
+              className="focus-ring w-full rounded-xl border border-[#cfc9bc] bg-white px-4 py-3.5 text-[#1d251f] outline-none transition focus:border-[#264a38]"
               placeholder="Your password"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">
+            <p className="rounded-xl border border-[#b65f42]/20 bg-[#f0ded4] px-4 py-3 text-sm text-[#8f3f2b]">
               {error}
             </p>
           )}
@@ -100,19 +106,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-black px-4 py-2 font-medium text-white disabled:opacity-50"
+            className="focus-ring w-full rounded-xl bg-[#264a38] px-5 py-3.5 font-bold text-white transition hover:bg-[#173326] disabled:opacity-50"
           >
             {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
-
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <a href="/register" className="font-medium text-black underline">
-            Create one
-          </a>
-        </p>
-      </div>
-    </main>
+    </AuthShell>
   );
 }

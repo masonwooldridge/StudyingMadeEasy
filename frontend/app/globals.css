@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f3f0e8;
+  --paper-deep: #e9e3d6;
+  --surface: #fbfaf6;
+  --ink: #1d251f;
+  --muted: #687169;
+  --line: #d9d4c8;
+  --forest: #264a38;
+  --forest-deep: #173326;
+  --clay: #b65f42;
+  --clay-soft: #f0ded4;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-fraunces);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 8% 2%, rgba(255, 255, 255, 0.9), transparent 28rem),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-manrope), sans-serif;
+}
+
+button,
+a,
+input,
+textarea,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+summary {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+::selection {
+  background: var(--clay-soft);
+  color: var(--forest-deep);
+}
+
+.display-type {
+  font-family: var(--font-fraunces), serif;
+  font-variation-settings: "SOFT" 60, "WONK" 0;
+}
+
+.paper-grid {
+  background-image:
+    linear-gradient(rgba(38, 74, 56, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(38, 74, 56, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.subtle-shadow {
+  box-shadow: 0 24px 70px rgba(40, 47, 40, 0.08);
+}
+
+.lift {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(31, 42, 34, 0.09);
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid rgba(182, 95, 66, 0.28);
+  outline-offset: 2px;
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+.thinking-dot {
+  animation: soft-pulse 1.15s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(2) { animation-delay: 140ms; }
+.thinking-dot:nth-child(3) { animation-delay: 280ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

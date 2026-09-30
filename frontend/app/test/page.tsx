@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { API_URL } from "../lib/api";
 
 export default function TestPage() {
   const [message, setMessage] = useState("Connecting to backend...");
 
   useEffect(() => {
-    fetch("http://localhost:8000/")
+    fetch(`${API_URL}/`)
       .then((response) => response.json())
       .then((data) => setMessage(data.message))
       .catch(() => setMessage("Could not connect to backend"));
